@@ -18,14 +18,16 @@ import type { CustomClient } from '..';
 import { createTimeOption, leaderboardStatOption, playerOption, TIME_OPTIONS } from '../util/options';
 import { getTopGainsWithin } from '../../../db';
 import ms from 'ms'
+
 const millify = (num: number) => {
+    if(!num) return '0';
     // add commas to the number
-    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
 export default class LeaderboardGainCommand extends BunCommand<CustomClient> {
 
-    ENTIRES_PER_PAGE = 6
+    ENTIRES_PER_PAGE = 12
 
   constructor() {
     super('gain-leaderboard', {
@@ -78,7 +80,7 @@ export default class LeaderboardGainCommand extends BunCommand<CustomClient> {
     const fields: EmbedField[] = gainData.slice(startIndex, startIndex+this.ENTIRES_PER_PAGE).map((data, index) => {
         return {
             name: `${index+1 + (page*this.ENTIRES_PER_PAGE)}. ${data.username}`,
-            value: `+${data.gain} (${millify(data.oldStat)} -> ${millify(data.newStat)})`,
+            value: `**+${data.gain}**\n (\`${millify(data.oldStat)} ⇨ ${millify(data.newStat)})\``,
             inline: true
         }
     })
