@@ -1,24 +1,24 @@
 export type ProvidedPlayer = {
-    username: string;
-    uuid: string;
-}
+	username: string;
+	uuid: string;
+};
 
 export type ProvidedGuild = {
-    name: string;
-    tag: string;
-}
+	name: string;
+	tag: string;
+};
 
 type NameProvider = {
-    name: string;
-    type: 'guild' | 'player';
-}
+	name: string;
+	type: "guild" | "player";
+};
 
 export type PlayerNameProvider = {
-    type: 'player';
-    fetchNameList: () => Promise<ProvidedPlayer[]>;
-} & NameProvider
+	type: "player";
+	fetchNameList: () => Promise<ProvidedPlayer[]>;
+} & NameProvider;
 
 export type GuildNameProvider = {
-    type: 'guild';
-    fetchNameList: () => Promise<ProvidedGuild[]>;
-} & NameProvider
+	type: "guild";
+	fetchNameList: () => Promise<ProvidedGuild[]>;
+} & NameProvider;
