@@ -1,14 +1,21 @@
-import DayJS from "dayjs";
-import DayJSDuration from "dayjs/plugin/duration";
-import DayJSRelativeTime from "dayjs/plugin/relativeTime";
-DayJS.extend(DayJSDuration);
-DayJS.extend(DayJSRelativeTime);
+import { getPlayerProfile } from "./api";
 
-const string = "PT40H20M37.773S";
+const data = {};
 
-const duration = DayJS.duration(string);
+for await (const name of ["byBackfish", "JsMew", "evilpope", "Looniitick"]) {
+	const profile = await getPlayerProfile(name);
 
-// Manually format the duration
-const formatted = `${duration.hours()} hours ${duration.minutes()} minutes ${duration.seconds()} seconds`;
+	const stats = Object.keys(profile.statistics).filter((stat) =>
+		stat.startsWith("rotmc:boss"),
+	);
 
-console.log(formatted); // "40 hours 20 minutes 37.773 seconds"
+	stats.forEach((stat) => {
+		const value = profile.statistics[stat];
+		if (!data[stat]) {
+			data[stat] = {};
+			console.log(stat);
+		}
+	});
+}
+
+Bun.write("stats.json", JSON.stringify(data, null, 2));
