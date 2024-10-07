@@ -147,6 +147,7 @@ export const getStatNow = async <T>(
 export const getTopGainsWithin = async <T>(
 	stat: LeaderboardTypePlayer,
 	time: Date,
+	getValue: (data: T) => number = (data: T) => data as unknown as number,
 ) => {
 	let currentValues = [];
 
@@ -177,7 +178,7 @@ export const getTopGainsWithin = async <T>(
 			.orderBy(({ time }) => max(time));
 
 		currentValues = allPlayersNow.map((player) => {
-			const value = stat.getValue(player.data) || 0;
+			const value = stat.getValue(player.data) as unknown as T;
 			return {
 				username: player.username,
 				uuid: player.uuid,
@@ -217,7 +218,7 @@ export const getTopGainsWithin = async <T>(
 			.orderBy(({ time }) => min(time));
 
 		oldValues = allPlayersThen.map((player) => {
-			const value = stat.getValue(player.data) || 0;
+			const value = stat.getValue(player.data) as unknown as T;
 			return {
 				username: player.username,
 				uuid: player.uuid,
@@ -244,7 +245,7 @@ export const getTopGainsWithin = async <T>(
 				return {
 					username: player.username,
 					uuid: player.uuid,
-					gain: Number(player.value) || 0 - (Number(thenPlayer.value) || 0),
+					gain: getValue(player.value) - getValue(thenPlayer.value),
 					time: thenPlayer.time,
 					oldStat: thenPlayer.value,
 					newStat: player.value,

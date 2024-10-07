@@ -1,9 +1,11 @@
 import { BunCommand, type CommandArgument } from "@bybackfish/buncord";
 import type { AutocompleteInteraction } from "discord.js";
 import type { CustomClient } from "..";
-import type { ProvidedPlayer } from "../../name-providers/provider";
+import { db } from "../../../db";
+import { users } from "../../../db/schema";
+import { LEADERBOARD_TYPES } from "../../leaderboard-types";
 
-export const playerOption = (valueKey: keyof ProvidedPlayer): CommandArgument =>
+export const playerOption = (): CommandArgument =>
 	({
 		name: "player",
 		description: "Player's Username",
@@ -15,15 +17,22 @@ export const playerOption = (valueKey: keyof ProvidedPlayer): CommandArgument =>
 			interaction: AutocompleteInteraction,
 		) => {
 			const current = interaction.options.getFocused();
-			const players = client.playerService
-				.getPlayers()
-				.filter((player) =>
-					player.username.toLowerCase().includes(current.toLowerCase()),
+			const players = (
+				await db
+					.select({
+						username: users.username,
+					})
+					.from(users)
+					.groupBy(({ username }) => username)
+			)
+				.filter(({ username }) =>
+					username.toLowerCase().includes(current.toLowerCase()),
 				)
 				.slice(0, 25);
+
 			return players.map((player) => ({
 				name: player.username,
-				value: player[valueKey],
+				value: player.username,
 			}));
 		},
 	}) as CommandArgument;
@@ -40,51 +49,13 @@ export const leaderboardStatOption = (required = true): CommandArgument =>
 			interaction: AutocompleteInteraction,
 		) => {
 			const current = interaction.options.getFocused();
-			return client.leaderboardTypes
-				.filter((type) =>
-					type.name.toLowerCase().includes(current.toLowerCase()),
-				)
+			return LEADERBOARD_TYPES.filter((type) =>
+				type.name.toLowerCase().includes(current.toLowerCase()),
+			)
 				.slice(0, 25)
 				.map((type) => ({
 					name: type.name,
 					value: type.name,
 				}));
 		},
-	}) as CommandArgument;
-
-export const TIME_OPTIONS = [
-	{
-		name: "All Time",
-		value: "-1",
-	},
-	{
-		name: "Last Hour",
-		value: "1h",
-	},
-	{
-		name: "Last 24 Hours",
-		value: "1d",
-	},
-	{
-		name: "Last 7 Days",
-		value: "7d",
-	},
-	{
-		name: "Last 30 Days",
-		value: "30d",
-	},
-	{
-		name: "Last 90 Days",
-		value: "90d",
-	},
-];
-
-export const createTimeOption = (required = true): CommandArgument =>
-	({
-		name: "time",
-		description: "Time to display the leaderboard for",
-		required,
-		default: "-1",
-		type: BunCommand.Type.STRING,
-		choices: TIME_OPTIONS,
 	}) as CommandArgument;

@@ -7,7 +7,7 @@ export default class ReadyListener extends BunListener<CustomClient, "ready"> {
 		super("ready");
 	}
 
-	public async execute(_: any) {
+	public async execute(client: Client) {
 		const invite = this.client.generateInvite({
 			scopes: [OAuth2Scopes.Bot, OAuth2Scopes.ApplicationsCommands],
 			permissions: PermissionFlagsBits.Administrator,
