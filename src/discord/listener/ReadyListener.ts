@@ -1,5 +1,5 @@
 import { BunListener } from "@bybackfish/buncord";
-import { Client, OAuth2Scopes, PermissionFlagsBits } from "discord.js";
+import { type Client, OAuth2Scopes, PermissionFlagsBits } from "discord.js";
 import type { CustomClient } from "..";
 
 export default class ReadyListener extends BunListener<CustomClient, "ready"> {

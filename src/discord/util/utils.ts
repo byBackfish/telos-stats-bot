@@ -36,3 +36,5 @@ export const formatTimeToDuration = (time: string): string => {
 
 	return string;
 };
+
+export const getRealmName = (id: string | undefined) => id?.split("realm:")[1];

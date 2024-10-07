@@ -5,7 +5,7 @@ export const users = sqliteTable("users", {
 	id: integer("id", { mode: "number" })
 		.primaryKey({ autoIncrement: true })
 		.notNull(),
-	uuid: text("uuid").notNull(),
+	uuid: text("uuid").notNull().unique(),
 	username: text("username").notNull(),
 	time: integer("time", { mode: "timestamp_ms" }).notNull().defaultNow(),
 	data: text("data", { mode: "json" }).$type<PlayerProfile>().notNull(),
