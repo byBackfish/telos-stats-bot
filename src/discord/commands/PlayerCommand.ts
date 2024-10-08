@@ -833,7 +833,7 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
         menu.addOptions(
             classes.map((character) => {
                 return {
-                    label: `${character.type} (${character.level})`,
+                    label: `${getRealmName(character.type)} | Level ${character.level}`,
                     default: character.uniqueId === selectedClass,
                     value: character.uniqueId,
                 };
