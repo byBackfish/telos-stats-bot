@@ -39,6 +39,6 @@ export const formatTimeToDuration = (time: string): string => {
 
 export const getRealmName = (id: string | undefined, titleCase = true) => {
     if (!id) return null
-    const name = id?.split("realm:").slice(-1)[0].replace(/-/g, " ");
+    const name = id?.split("realm:").pop()?.replace(/_/g, " ");
     return titleCase ? name?.replace(/\b\w/g, (l) => l.toUpperCase()) : name;
 }
