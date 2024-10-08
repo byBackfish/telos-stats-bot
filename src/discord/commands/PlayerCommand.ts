@@ -12,6 +12,7 @@ import {
     type CommandInteraction,
     EmbedBuilder,
     type JSONEncodable,
+    Message,
     type ModalActionRowComponentBuilder,
     ModalBuilder,
     type ModalSubmitInteraction,
@@ -50,6 +51,8 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
 
     YES = "✅";
     NO = "❌";
+
+    ClearHandlers: Map<string, Timer> = new Map();
 
     CATEGORIES: PlayerStatCategory[] = [
         {
@@ -705,13 +708,25 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
             components.push(pageButtons);
         }
 
-        const { id: newId } = await interaction.editReply({
+        const message = await interaction.editReply({
             content: "",
             embeds: [embed],
             components: components as JSONEncodable<
                 APIActionRowComponent<APIMessageActionRowComponent>
             >[],
         });
+        const timeout = setTimeout(() => {
+            console.log("Clearing handlers");
+            message.edit({
+                components: [],
+            });
+            this.ClearHandlers.delete(interaction.id);
+        }, 30000);
+
+        if (this.ClearHandlers.has(interaction.id)) clearTimeout(this.ClearHandlers.get(interaction.id));
+        this.ClearHandlers.set(interaction.id, timeout);
+
+        const { id: newId } = message;
 
         this.client
             .await<StringSelectMenuInteraction>(`classSelect-${id}`)
