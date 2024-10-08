@@ -144,7 +144,7 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
         {
             name: "Class Info",
             customId: "classInfo",
-            emoji: "📜",
+            emoji: "📄",
             type: "class",
             createEmbeds: async (interaction, data, { character }) => {
                 const ruleset = await getEmoji(
