@@ -1,25 +1,24 @@
 import {
     BunCommand,
-    type CommandArgument,
     type CommandReturnable,
 } from "@bybackfish/buncord";
 import {
-    ActionRow,
     ActionRowBuilder,
     type APIActionRowComponent,
     type APIMessageActionRowComponent,
     ButtonBuilder,
-    ButtonComponent,
     type ButtonInteraction,
     ButtonStyle,
     type CommandInteraction,
     EmbedBuilder,
     type JSONEncodable,
-    SelectMenuComponent,
-    type SelectMenuInteraction,
+    type ModalActionRowComponentBuilder,
+    ModalBuilder,
+    type ModalSubmitInteraction,
     StringSelectMenuBuilder,
-    StringSelectMenuComponent,
     type StringSelectMenuInteraction,
+    TextInputBuilder,
+    TextInputStyle,
 } from "discord.js";
 import type { CustomClient } from "..";
 import { playerOption } from "../util/options";
@@ -720,7 +719,7 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
         });
 
         this.client
-            .await<SelectMenuInteraction>(`classSelect-${id}`)
+            .await<StringSelectMenuInteraction>(`classSelect-${id}`)
             .then((select) => {
                 const selectedClassId = select.values[0]
                 const selectedClass = data.characters.all.find(
@@ -742,7 +741,7 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
             });
 
         this.client
-            .await<SelectMenuInteraction>(`categorySelect-${id}`)
+            .await<StringSelectMenuInteraction>(`categorySelect-${id}`)
             .then((select) => {
                 const categoryId = select.values[0];
                 const selectedCategory =
@@ -789,6 +788,93 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
                 });
 
                 button.deferUpdate();
+            });
+
+            this.client.await<ButtonInteraction>(`page-${id}`, 10).then((button) => {
+                const modal = new ModalBuilder()
+                    .setTitle("Jump to Page")
+                    .setCustomId(`jump-${id}`);
+
+                const numberInput = new TextInputBuilder()
+                    .setMinLength(1)
+                    .setMaxLength(10)
+                    .setPlaceholder("Number of the page")
+                    .setCustomId("jumpNumber")
+                    .setLabel("Jump to page number")
+                    .setStyle(TextInputStyle.Short)
+                    .setRequired(false)
+
+                const textInput = new TextInputBuilder()
+                    .setMinLength(1)
+                    .setMaxLength(32)
+                    .setPlaceholder("Title to search for")
+                    .setCustomId("jumpText")
+                    .setLabel("Search for a page")
+                    .setStyle(TextInputStyle.Short)
+                    .setRequired(false)
+
+                const rows: ActionRowBuilder<ModalActionRowComponentBuilder>[] = [
+                    new ActionRowBuilder().addComponents([numberInput]) as ActionRowBuilder<ModalActionRowComponentBuilder>,
+                    new ActionRowBuilder().addComponents([textInput]) as ActionRowBuilder<ModalActionRowComponentBuilder>,
+                ]
+
+                modal.addComponents(rows)
+
+                button.showModal(modal)
+
+                this.client.await<ModalSubmitInteraction>(`jump-${id}`).then((submit) => {
+                    const text = submit.fields.getField("jumpText")?.value;
+                    const numberText = submit.fields.getField("jumpNumber")?.value;
+
+                    if (text) {
+                        const index = embeds.findIndex((embed) =>
+                            embed.data.title?.toLowerCase()?.includes(text.toLowerCase()) || embed.data.description?.toLowerCase()?.includes(text.toLowerCase())
+                        );
+
+                        if (index) {
+                            submit.deferUpdate()
+                            this.sendMessage(interaction, {
+                                selectedCategory,
+                                data,
+                                id: newId,
+                                selectedClassId,
+                                selectedClass,
+                                currentPage: index,
+                                embeds,
+                            });
+                        } else {
+                            return submit.reply({
+                                content: "No page found with that text",
+                                ephemeral: true
+                            })
+                        }
+                    } else if (numberText) {
+                        const number = Number(numberText) - 1
+                        if (Number.isInteger(number) && !Number.isNaN(number) && number >= 0 && number < embeds.length) {
+                            submit.deferUpdate()
+                            this.sendMessage(interaction, {
+                                selectedCategory,
+                                data,
+                                id: newId,
+                                selectedClassId,
+                                selectedClass,
+                                currentPage: number,
+                                embeds,
+                            });
+                        } else {
+                            return submit.reply({
+                                content: "Invalid page number",
+                                ephemeral: true
+                            })
+                        }
+
+                    } else {
+                        return submit.reply({
+                            content: "You need to input a number or a title to search for",
+                            ephemeral: true
+                        })
+                    }
+                })
             });
         }
     }
@@ -863,7 +949,6 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
             .setCustomId(`page-${id}`)
             .setLabel(`${currentPage + 1}/${maxPage + 1}`)
             .setStyle(ButtonStyle.Primary)
-            .setDisabled(true);
 
         if (currentPage === 0) {
             backButton.setDisabled(true);
