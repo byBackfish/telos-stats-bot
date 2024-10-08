@@ -832,7 +832,7 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
 
                 button.showModal(modal)
 
-                this.client.await<ModalSubmitInteraction>(`jump-${id}`).then((submit) => {
+                this.client.await<ModalSubmitInteraction>(`jump-${id}`, 100).then((submit) => {
                     const text = submit.fields.getField("jumpText")?.value;
                     const numberText = submit.fields.getField("jumpNumber")?.value;
                     let targetPage = 0;
