@@ -215,8 +215,7 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
                         embed.addFields(
                             this.field(
                                 "Potion Requirement",
-                                `Normal: ${component.allowNormal ? this.YES : this.NO}
-                            Greater: ${component.allowGreater ? this.YES : this.NO}`,
+                                `Normal: ${component.allowNormal ? this.YES : this.NO}\nGreater: ${component.allowGreater ? this.YES : this.NO}`,
                             ),
                         );
                     }
@@ -426,11 +425,7 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
                 const selectedPet = getRealmName(companions.selected.pet);
                 const selectedMount = getRealmName(companions.selected.mount);
 
-                const description = `\`Pets\`
-                ${(pets.map(({ name, emoji }) => (name === selectedPet ? `${emoji} **>> ${name} <<** ` : `${emoji} ${name}`))).join("\n")}
-
-                \`Mounts\`
-                ${(mounts.map(({ name, emoji }) => (name === selectedMount ? `${emoji} **>> ${name} <<** ` : `${emoji} ${name}`))).join("\n")}`;
+                const description = `\`Pets\`\n${(pets.map(({ name, emoji }) => (name === selectedPet ? `${emoji} **>> ${name} <<** ` : `${emoji} ${name}`))).join("\n")}\n\`Mounts\`\n${(mounts.map(({ name, emoji }) => (name === selectedMount ? `${emoji} **>> ${name} <<** ` : `${emoji} ${name}`))).join("\n")}`;
 
                 embed.setDescription(description);
 
