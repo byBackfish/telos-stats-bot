@@ -130,8 +130,8 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
                     for (const character of chunk) {
                         embed.addFields([
                             this.field(
-                                character.type,
-                                `Level: ${character.level}(${formatNumber(character.fame)})`,
+                                getRealmName(character.type) || "Unknown",
+                                `Level: ${character.level} (❖ ${formatNumber(character.fame)})`,
                                 true
                             ),
                         ]);
@@ -182,7 +182,7 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
                 ).map((chunk) => {
                     const embed = this.getDefaultEmbeds(interaction, data).addFields(
                         chunk.map(([name, value]) => {
-                            return this.field(name, value, true);
+                            return this.field(getRealmName(name) || "Unknown", `Value: ${value}`, true);
                         }),
                     );
                     return embed;
@@ -210,7 +210,7 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
                         );
                     } else if (component.type === "class") {
                         embed.addFields(
-                            this.field("Class Requirement", component.whitelist.join(", ")),
+                            this.field("Class Requirement", component.whitelist.map(classReq => getRealmName(classReq)).join(", ")),
                         );
                     } else if (component.type === "potion") {
                         embed.addFields(
