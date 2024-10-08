@@ -800,7 +800,7 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
                 button.deferUpdate();
             });
 
-            this.client.await<ButtonInteraction>(`page-${id}`, 10).then((button) => {
+            this.client.await<ButtonInteraction>(`page-${id}`).then((button) => {
                 const modal = new ModalBuilder()
                     .setTitle("Jump to Page")
                     .setCustomId(`jump-${id}`);
@@ -835,6 +835,7 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
                 this.client.await<ModalSubmitInteraction>(`jump-${id}`).then((submit) => {
                     const text = submit.fields.getField("jumpText")?.value;
                     const numberText = submit.fields.getField("jumpNumber")?.value;
+                    let targetPage = 0;
 
                     if (text) {
                         const index = embeds.findIndex((embed) =>
@@ -843,17 +844,9 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
 
                         if (index) {
                             submit.deferUpdate()
-                            this.sendMessage(interaction, {
-                                selectedCategory,
-                                data,
-                                id: newId,
-                                selectedClassId,
-                                selectedClass,
-                                currentPage: index,
-                                embeds,
-                            });
+                            targetPage = index;
                         } else {
-                            return submit.reply({
+                            submit.reply({
                                 content: "No page found with that text",
                                 ephemeral: true
                             })
@@ -862,28 +855,29 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
                         const number = Number(numberText) - 1
                         if (Number.isInteger(number) && !Number.isNaN(number) && number >= 0 && number < embeds.length) {
                             submit.deferUpdate()
-                            this.sendMessage(interaction, {
-                                selectedCategory,
-                                data,
-                                id: newId,
-                                selectedClassId,
-                                selectedClass,
-                                currentPage: number,
-                                embeds,
-                            });
+                            targetPage = number;
                         } else {
-                            return submit.reply({
+                            submit.reply({
                                 content: "Invalid page number",
                                 ephemeral: true
                             })
                         }
-
                     } else {
-                        return submit.reply({
+                        submit.reply({
                             content: "You need to input a number or a title to search for",
                             ephemeral: true
                         })
                     }
+
+                    this.sendMessage(interaction, {
+                        selectedCategory,
+                        data,
+                        id: newId,
+                        selectedClassId,
+                        selectedClass,
+                        currentPage: targetPage,
+                        embeds,
+                    });
                 })
             });
         }
