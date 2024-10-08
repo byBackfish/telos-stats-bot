@@ -99,10 +99,10 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
                 const mountName = actualMountName || "No Mount";
 
                 embed.addFields([
-                    this.field("Rank", data.rank, true),
+                    this.field("Rank", getRealmName(data.rank), true),
                     this.field("Playtime", formatTimeToDuration(data.playTime), false),
                     this.field("Glory", `❖ ${formatNumber(data.balance)}`, true),
-                    this.field("Selected Glow", data.glow || "None", true),
+                    this.field("Selected Glow", getRealmName(data.glow) || "None", true),
                     this.field("Selected Pet", `${petEmoji} ${petName}`, false),
                     this.field("Selected Mount", `${mountEmoji} ${mountName}`, false),
                     this.field(
