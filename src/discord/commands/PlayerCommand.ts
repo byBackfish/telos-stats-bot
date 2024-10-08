@@ -683,14 +683,14 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
         const page = Math.min(options.currentPage || 0, embeds.length - 1);
         const embed = embeds[page];
 
-        const buttons = this.createButtons(possibleCategories, id);
+        const buttons = this.createButtons(possibleCategories, selectedCategory, id);
         const classSelect = this.createClassSelectMenu(
             selectedClassId,
             data.characters.all,
             id,
         );
 
-        const components = [classSelect, ...buttons];
+        const components = [classSelect, buttons];
 
         const hasPagination = embeds.length > 1;
         if (hasPagination) {
@@ -713,10 +713,11 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
         this.client
             .await<SelectMenuInteraction>(`classSelect-${id}`)
             .then((select) => {
-                const selectedClassId = select.values[0];
+                const selectedClassId = select.values[0]
                 const selectedClass = data.characters.all.find(
                     (character) => character.uniqueId === selectedClassId,
                 );
+
 
                 this.sendMessage(interaction, {
                     selectedCategory,
@@ -731,28 +732,27 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
                 select.deferUpdate();
             });
 
-        for (const category of this.CATEGORIES) {
-            this.client
-                .await<ButtonInteraction>(`${category.customId}-${id}`)
-                .then((button) => {
-                    const categoryId = button.customId.split("-")[0];
-                    const selectedCategory =
-                        this.CATEGORIES.find((c) => c.customId === categoryId) ||
-                        options.selectedCategory;
+        this.client
+            .await<SelectMenuInteraction>(`categorySelect-${id}`)
+            .then((select) => {
+                const categoryId = select.values[0];
+                const selectedCategory =
+                    this.CATEGORIES.find((c) => c.customId === categoryId) ||
+                    options.selectedCategory;
 
-                    this.sendMessage(interaction, {
-                        selectedCategory,
-                        data,
-                        id: newId,
-                        selectedClassId,
-                        selectedClass,
-                        currentPage: 0,
-                        embeds: undefined,
-                    });
-
-                    button.deferUpdate();
+                this.sendMessage(interaction, {
+                    selectedCategory,
+                    data,
+                    id: newId,
+                    selectedClassId,
+                    selectedClass,
+                    currentPage: 0,
+                    embeds: undefined,
                 });
-        }
+
+                select.deferUpdate();
+            });
+
         if (hasPagination) {
             this.client.await<ButtonInteraction>(`back-${id}`).then((button) => {
                 this.sendMessage(interaction, {
@@ -786,22 +786,28 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
 
     createButtons(
         categories: PlayerStatCategory[],
+        currentValue: PlayerStatCategory,
         id: string,
-    ): ActionRowBuilder[] {
-        return chunkArray(categories, 5).map((chunk) => {
-            const row = new ActionRowBuilder();
+    ): ActionRowBuilder {
+        const row = new ActionRowBuilder();
+        const selection = new StringSelectMenuBuilder()
+            .setCustomId(`categorySelect-${id}`)
+            .setPlaceholder("Select a Category")
+            .setMinValues(1)
+            .setMaxValues(1);
 
-            const buttons = chunk.map((category) => {
-                return new ButtonBuilder()
-                    .setCustomId(`${category.customId}-${id}`)
-                    .setLabel(category.name)
-                    .setEmoji(category.emoji)
-                    .setStyle(ButtonStyle.Primary);
-            });
+        selection.addOptions(
+            categories.map((category) => {
+                return {
+                    label: `${category.emoji} ${category.name}`,
+                    value: category.customId,
+                    default: category === currentValue,
+                };
+            }),
+        );
 
-            row.addComponents(buttons);
-            return row;
-        });
+        row.addComponents(selection);
+        return row;
     }
 
     createClassSelectMenu(
