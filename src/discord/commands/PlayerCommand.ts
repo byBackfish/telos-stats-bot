@@ -800,7 +800,7 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
                 button.deferUpdate();
             });
 
-            this.client.await<ButtonInteraction>(`page-${id}`).then((button) => {
+            this.client.await<ButtonInteraction>(`page-${id}`, 100).then((button) => {
                 const modal = new ModalBuilder()
                     .setTitle("Jump to Page")
                     .setCustomId(`jump-${id}`);
@@ -832,7 +832,8 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
 
                 button.showModal(modal)
 
-                this.client.await<ModalSubmitInteraction>(`jump-${id}`, 100).then((submit) => {
+                this.client.await<ModalSubmitInteraction>(`jump-${id}`).then((submit) => {
+                    console.log("submitatasasaskansdjashdlahd")
                     const text = submit.fields.getField("jumpText")?.value;
                     const numberText = submit.fields.getField("jumpNumber")?.value;
                     let targetPage = 0;
