@@ -99,12 +99,12 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
                 const mountName = actualMountName || "No Mount";
 
                 embed.addFields([
-                    this.field("Rank", data.rank),
-                    this.field("Playtime", formatTimeToDuration(data.playTime)),
-                    this.field("Glory", `❖ ${formatNumber(data.balance)}`),
-                    this.field("Selected Glow", data.glow || "None"),
-                    this.field("Selected Pet", `${petEmoji} ${petName}`),
-                    this.field("Selected Mount", `${mountEmoji} ${mountName}`),
+                    this.field("Rank", data.rank, true),
+                    this.field("Playtime", formatTimeToDuration(data.playTime), false),
+                    this.field("Glory", `❖ ${formatNumber(data.balance)}`, true),
+                    this.field("Selected Glow", data.glow || "None", true),
+                    this.field("Selected Pet", `${petEmoji} ${petName}`, false),
+                    this.field("Selected Mount", `${mountEmoji} ${mountName}`, false),
                     this.field(
                         "Boosts",
                         `Loot Boost: ${data.boost.loot ? this.YES : this.NO}\nFame Boost: ${data.boost.fame ? this.YES : this.NO}`,
@@ -132,6 +132,7 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
                             this.field(
                                 character.type,
                                 `Level: ${character.level}(${formatNumber(character.fame)})`,
+                                true
                             ),
                         ]);
                     }
@@ -143,7 +144,7 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
         {
             name: "Class Info",
             customId: "classInfo",
-            emoji: "ℹ️",
+            emoji: "📜",
             type: "class",
             createEmbeds: async (interaction, data, { character }) => {
                 const ruleset = await getEmoji(
@@ -154,11 +155,11 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
 
                 const embed = this.getDefaultEmbeds(interaction, data).addFields([
                     this.field("Ruleset", ruleset),
-                    this.field("Class", character.type),
-                    this.field("Level", character.level),
-                    this.field("Fame", character.fame),
-                    this.field("Death Count", character.statistics["rotmc:deaths"]),
+                    this.field("Class", character.type, true),
+                    this.field("Level", character.level, true),
                     this.field("Playtime", formatTimeToDuration(character.playTime)),
+                    this.field("Fame", character.fame, true),
+                    this.field("Death Count", character.statistics["rotmc:deaths"], true),
                 ]);
 
                 if (character.runes.length > 0) {
@@ -200,6 +201,7 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
                 } = character;
 
                 const embed = this.getDefaultEmbeds(interaction, data);
+                embed.setDescription("🔍 **Item Filter** 🔍");
 
                 for (const component of components) {
                     if (component.type === "tier") {
@@ -230,6 +232,7 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
                             return this.field(name, value);
                         }),
                     );
+                    embed.setDescription("🧪 **Potions** 🧪");
                     return embed;
                 });
 
@@ -344,7 +347,19 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
                 const {
                     quests: { progress },
                 } = data;
-                const quests = Object.entries(progress).sort((a, b) => {
+                const quests = Object.entries(progress)
+
+                const tutorialQuests = quests.filter(([name, value]) =>
+                    name.startsWith("realm:starter_"),
+                ).sort((a, b) => {
+                    const idA = Number(a[0].split("_")[1]);
+                    const idB = Number(b[0].split("_")[1]);
+
+                    return idA - idB;
+                });
+                const weeklyQuests = quests.filter(
+                    ([name, value]) => !name.startsWith("realm:starter_"),
+                ).sort((a, b) => {
                     const [aKey, aValue] = a;
                     const [bKey, bValue] = b;
 
@@ -362,15 +377,9 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
                     return aKey.localeCompare(bKey);
                 });
 
-                const tutorialQuests = quests.filter(([name, value]) =>
-                    name.startsWith("realm:starter_"),
-                );
-                const weeklyQuests = quests.filter(
-                    ([name, value]) => !name.startsWith("realm:starter_"),
-                );
-
-                const embeds = [tutorialQuests, weeklyQuests].map((quests) => {
+                const embeds = [{ name: "Weekly", quests: weeklyQuests }, { name: "Tutorial", quests: tutorialQuests }].map(({ name, quests }) => {
                     const embed = this.getDefaultEmbeds(interaction, data);
+                    embed.setDescription(`**${name} Quests**`);
 
                     for (const [name, value] of quests) {
                         embed.addFields(
