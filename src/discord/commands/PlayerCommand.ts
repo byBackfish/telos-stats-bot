@@ -983,15 +983,15 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
     }
 
     getDefaultEmbeds(interaction: CommandInteraction, data: PlayerProfile) {
-        const imageUrl = `https://crafatar.com/avatars/${data.uniqueId}.jpg`;
+        const imageUrl = `https://minotar.net/avatar/${data.username}/512.png`;
         return new EmbedBuilder()
             .setColor("Aqua")
             .setTitle(`Stats for ${data.username}`)
             .setFooter({
                 text: `Requested by ${interaction.user.username}`,
                 iconURL: interaction.user.displayAvatarURL(),
-            });
-        //.setThumbnail(imageUrl);
+            })
+            .setThumbnail(imageUrl);
     }
 }
 
