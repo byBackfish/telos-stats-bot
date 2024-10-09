@@ -115,6 +115,10 @@ export const DropChances: ChanceData = {
 			text: "1/350",
 			chance: 0.00285714286,
 		},
+        rune: {
+            text: "1/50",
+            chance: 0.02,
+        }
 	},
 	"rotmc:boss-illarius": {
 		white: {
@@ -157,6 +161,10 @@ export const DropChances: ChanceData = {
 			text: "1/350",
 			chance: 0.00285714286,
 		},
+        rune: {
+            text: "1/50",
+            chance: 0.02,
+        }
 	},
 	"rotmc:boss-anubis": {
 		white: {
@@ -183,6 +191,10 @@ export const DropChances: ChanceData = {
 			text: "1/350",
 			chance: 0.00285714286,
 		},
+        rune: {
+            text: "1/50",
+            chance: 0.02,
+        }
 	},
 	"rotmc:boss-shadowflare": {
 		white: {
@@ -197,6 +209,10 @@ export const DropChances: ChanceData = {
 			text: "1/600",
 			chance: 0.00166666667,
 		},
+        rune: {
+            text: "1/50",
+            chance: 0.02,
+        }
 	},
 	"rotmc:boss-dark_champion": {
 		white: {
@@ -251,6 +267,10 @@ export const DropChances: ChanceData = {
 			text: "1/350",
 			chance: 0.00285714286,
 		},
+        rune: {
+            text: "1/50",
+            chance: 0.02,
+        }
 	},
 	"rotmc:boss-kurvaros": {
 		white: {
@@ -265,6 +285,10 @@ export const DropChances: ChanceData = {
 			text: "1/350",
 			chance: 0.00285714286,
 		},
+        rune: {
+            text: "1/50",
+            chance: 0.02,
+        }
 	},
 	"rotmc:boss-golden_freddy": {
 		white: {
@@ -275,6 +299,10 @@ export const DropChances: ChanceData = {
 			text: "1/350",
 			chance: 0.00285714286,
 		},
+        rune: {
+            text: "1/50",
+            chance: 0.02,
+        }
 	},
 	"rotmc:boss-loa": {
 		white: {
@@ -285,6 +313,10 @@ export const DropChances: ChanceData = {
 			text: "1/600",
 			chance: 0.00166666667,
 		},
+        rune: {
+            text: "1/50",
+            chance: 0.02,
+        }
 	},
 	"rotmc:boss-choji": {
 		green: {
@@ -319,6 +351,10 @@ export const DropChances: ChanceData = {
 			text: "1/600",
 			chance: 0.00166666667,
 		},
+        rune: {
+            text: "1/50",
+            chance: 0.02,
+        }
 	},
 	"rotmc:boss-reaper": {
 		white: {
@@ -371,6 +407,10 @@ export const DropChances: ChanceData = {
 			text: "1/600",
 			chance: 0.00166666667,
 		},
+        rune: {
+            text: "1/50",
+            chance: 0.02,
+        }
 	},
 	"rotmc:boss-asmodeus": {
 		black: {
@@ -391,6 +431,10 @@ export const DropChances: ChanceData = {
 			text: "1/500",
 			chance: 0.002,
 		},
+        rune: {
+            text: "1/50",
+            chance: 0.02,
+        }
 	},
 	"rotmc:boss-arctic_colossus": {
 		white: {
@@ -423,6 +467,10 @@ export const DropChances: ChanceData = {
 			text: "1/600",
 			chance: 0.00166666667,
 		},
+        rune: {
+            text: "1/50",
+            chance: 0.02,
+        }
 	},
 	"rotmc:boss-khufu": {
 		green: {
