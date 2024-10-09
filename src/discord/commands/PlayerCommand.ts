@@ -500,8 +500,9 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
                     data: BossData[],
                     bagName: string,
                     bagProbability: string | number | undefined = undefined,
-                ) => {
+                ): { kills: number; expected: number} => {
                     let total = 0;
+                    let kills = 0;
 
                     for (const boss of data) {
                         const bag = boss.bags[bagName];
@@ -513,10 +514,14 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
                                 bag.text === bagProbability
                             ) {
                                 total += bag.expected;
+                                kills += bag.kills;
                             }
                         }
                     }
-                    return total;
+                    return {
+                        kills,
+                        expected: total,
+                    };
                 };
 
                 const allBagNamesAndProbabilities: Record<string, string[]> = {};
@@ -542,33 +547,21 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
                 for (const [name, probabilities] of Object.entries(
                     allBagNamesAndProbabilities,
                 )) {
-                    const total = calculateExpectedBagDrops(result, name);
+                    const {expected, kills: bagKills} = calculateExpectedBagDrops(result, name);
 
-                    const totalKills = result.reduce(
-                        (acc, boss) => {
-                            const bag = boss.bags[name];
-
-                            if (bag) {
-                                acc.count += bag.kills;
-                            }
-
-                            return acc;
-                        },
-                        { count: 0 },
-                    ).count;
-
-                    let description = `**Total Kills**: \`${totalKills}\`\n**Expected Drops**: \`${Math.round(total * 1000) / 1000}\`\n`;
+                    let description = `**Total Kills**: \`${bagKills}\`\n**Expected Drops**: \`${Math.round(expected * 1000) / 1000}\`\n`;
 
                     if (probabilities.length > 1) {
                         description += probabilities
                             .map((probability) => {
-                                const expected = calculateExpectedBagDrops(
+                                const {expected, kills} = calculateExpectedBagDrops(
                                     result,
                                     name,
                                     probability,
                                 );
 
-                                return `**${probability}** Drops: \`${formatNumber(Math.round(expected * 1000) / 1000)}\``;
+
+                                return `**${probability}** Drops: \`${formatNumber(Math.round(expected * 1000) / 1000)}\` (${formatNumber(kills)} kills)`;
                             })
                             .join("\n");
                     }
@@ -721,7 +714,7 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
                 components: [],
             });
             this.ClearHandlers.delete(interaction.id);
-        }, 30000);
+        }, 60000);
 
         if (this.ClearHandlers.has(interaction.id)) clearTimeout(this.ClearHandlers.get(interaction.id));
         this.ClearHandlers.set(interaction.id, timeout);
@@ -842,8 +835,7 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
                         const index = embeds.findIndex((embed) =>
                             embed.data.title?.toLowerCase()?.includes(text.toLowerCase()) || embed.data.description?.toLowerCase()?.includes(text.toLowerCase())
                         );
-
-                        if (index) {
+                        if (index >= 0) {
                             submit.deferUpdate()
                             targetPage = index;
                         } else {
