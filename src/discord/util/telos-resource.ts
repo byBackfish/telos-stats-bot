@@ -6,7 +6,7 @@ export const getEmoji = async (
 	path: CdnPath,
 	assetName: string,
 ) => {
-	const name = Renames[assetName] ?? assetName;
+	const name = (Renames[assetName] ?? assetName).toLowerCase();
 	const emojiName = name.replace(/-| /g, "_");
 	const error = client.application?.emojis.cache.find(
 		(emoji) => emoji.name === "error",
