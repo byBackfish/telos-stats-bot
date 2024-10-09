@@ -937,14 +937,15 @@ export default class PlayerTrackCommand extends BunCommand<CustomClient> {
         const backButton = new ButtonBuilder()
             .setCustomId(`back-${id}`)
             .setEmoji("⬅️")
-            .setStyle(ButtonStyle.Primary);
+            .setStyle(ButtonStyle.Secondary);
         const forwardButton = new ButtonBuilder()
             .setCustomId(`forward-${id}`)
             .setEmoji("➡️")
-            .setStyle(ButtonStyle.Primary);
+            .setStyle(ButtonStyle.Secondary);
         const pageButton = new ButtonBuilder()
             .setCustomId(`page-${id}`)
-            .setLabel(`${currentPage + 1}/${maxPage + 1}`)
+            .setLabel(`Search | Page ${currentPage + 1}/${maxPage + 1}`)
+            .setEmoji("🔎")
             .setStyle(ButtonStyle.Primary)
 
         if (currentPage === 0) {
